@@ -190,9 +190,7 @@ export async function evaluateAchievements(userId: string, enrollmentId: string,
         break;
       case 'module_completed': {
         const mod = version.modules.find((m) => m.order === c.moduleOrder);
-        earned = !!mod && mod.lessons.length > 0 && mod.lessons.every((l) => done.has(l.id)) && version.title === version.title;
-        // Conquistas por módulo só valem para cursos com essa competência associada (quando houver).
-        if (earned && a.competencyId) earned = mod!.lessons.some((l) => l.competencies.some((lc) => lc.competencyId === a.competencyId)) || !version.modules.some((m) => m.lessons.some((l) => l.competencies.some((lc) => lc.competencyId === a.competencyId)));
+        earned = !!mod && mod.lessons.length > 0 && mod.lessons.every((l) => done.has(l.id));
         break;
       }
       case 'competency_score':
