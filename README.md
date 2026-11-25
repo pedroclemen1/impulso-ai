@@ -86,12 +86,14 @@ Legenda: ✅ implementado · 🟡 em andamento · ⬜ planejado
 | Regras determinísticas: pontuação de questões, classificação diagnóstica, nota ponderada, progresso e conclusão | ✅ |
 | Motor adaptativo determinístico (apresentação por nível, trilha sugerida, nível estimado, dificuldades recorrentes) | ✅ |
 | Cálculo de indicadores (conclusão, ativação, ganho, ganho normalizado, evolução após feedback, aprovação, engajamento, tempo ativo) | ✅ |
-| Motor de matrícula: recálculo de progresso, notas, competências, certificado e conquistas | 🟡 |
-| Alocações (individual, múltipla, por turma, sem duplicidade por versão) | ⬜ |
-| Diagnóstico, avaliações de módulo, avaliação final e pesquisa de satisfação (rotas do estudante) | ⬜ |
-| Submissão de atividades, avaliação com IA e revisão manual com histórico | ⬜ |
-| Tutor socrático (chat, pistas, solução comentada, consolidação) | ⬜ |
-| Dashboards e relatórios em CSV | ⬜ |
+| Motor de matrícula: recálculo de progresso, notas, competências, certificado e conquistas | ✅ |
+| Alocações (individual, múltipla, por turma, sem duplicidade por versão) | ✅ |
+| Diagnóstico, avaliações de módulo, avaliação final e pesquisa de satisfação (rotas do estudante) | ✅ |
+| Submissão de atividades, avaliação com IA e revisão manual com histórico | ✅ |
+| Tutor socrático (chat, pistas, solução comentada, consolidação) | ✅ |
+| Rotas do estudante: dashboard, visão do curso, aula personalizada, heartbeat de tempo ativo, competências e histórico | ✅ |
+| Dashboards administrativos e relatórios em CSV | ⬜ |
+| Inicialização do servidor (`app.ts`/`server.ts`), rotas de configuração de IA e de geração de cursos | ⬜ |
 | Documentação OpenAPI em `/api/docs` | ⬜ |
 
 ### Inteligência artificial
@@ -104,7 +106,7 @@ Legenda: ✅ implementado · 🟡 em andamento · ⬜ planejado
 | Gateway central: timeouts, retentativas limitadas, validação de saída estruturada com reparo, orçamento mensal, registro de uso (sem conteúdo sensível) e fallback | ✅ |
 | Prompts de sistema separados da lógica de negócio, com o conteúdo do estudante tratado como dado não confiável | ✅ |
 | Proteção LGPD: mascaramento de CPF, RG, e-mail e telefone antes do envio às LLMs; detecção de *prompt injection* | ✅ |
-| Serviços: geração de cursos por etapas, tutor socrático, avaliação de atividades, personalização e insights pedagógicos | 🟡 |
+| Serviços: geração de cursos por etapas, tutor socrático, avaliação de atividades, personalização e insights pedagógicos | ✅ |
 
 ### Frontend (React + TypeScript + Vite)
 
@@ -119,8 +121,8 @@ Legenda: ✅ implementado · 🟡 em andamento · ⬜ planejado
 
 | Item | Status |
 |---|---|
-| Curso completo “Inteligência Artificial Aplicada ao Recrutamento e Seleção” (6 módulos, atividades, rubricas, questionários) | 🟡 |
-| Dois cursos demonstrativos adicionais | 🟡 |
+| Curso completo “Inteligência Artificial Aplicada ao Recrutamento e Seleção” (6 módulos, 15 aulas, 6 atividades com rubricas, diagnóstico, avaliações e satisfação) | ✅ |
+| Dois cursos demonstrativos adicionais | ✅ |
 | Seed com 1 administrador, 15 participantes fictícios, 3 turmas e histórico de aprendizagem gerado pelos próprios serviços | ⬜ |
 
 ### Qualidade
