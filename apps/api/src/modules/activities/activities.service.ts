@@ -51,15 +51,17 @@ export const ActivitiesService = {
     ]
       .filter(Boolean)
       .join('\n\n');
+    const now = Date.now();
     await prisma.tutorMessage.createMany({
       data: [
-        { conversationId: conversation.id, role: 'STUDENT', kind: 'SUBMISSION', content, metadata: { submissionId: submission.id, attemptNumber: submission.attemptNumber } },
+        { conversationId: conversation.id, role: 'STUDENT', kind: 'SUBMISSION', content, metadata: { submissionId: submission.id, attemptNumber: submission.attemptNumber }, createdAt: new Date(now) },
         {
           conversationId: conversation.id,
           role: 'TUTOR',
           kind: 'SOCRATIC_FEEDBACK',
           content: feedback || 'Recebi sua resposta. O que você acrescentaria para torná-la mais completa?',
           metadata: { submissionId: submission.id, evaluationId: evaluation.id, weightedScore: evaluation.weightedScore, fallback },
+          createdAt: new Date(now + 1),
         },
       ],
     });

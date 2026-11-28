@@ -245,7 +245,7 @@ async function spreadTimeline(userId: string, stage: number, index: number) {
     ...submissions.map((s) => ({ kind: 'submission' as const, id: s.id, at: s.createdAt })),
     ...progress.map((p) => ({ kind: 'progress' as const, id: p.id, at: p.completedAt ?? p.startedAt })),
     ...messages.map((m) => ({ kind: 'message' as const, id: m.id, at: m.createdAt })),
-  ].sort((a, b) => a.at.getTime() - b.at.getTime());
+  ].sort((a, b) => a.at.getTime() - b.at.getTime() || a.id.localeCompare(b.id));
   if (!events.length) return;
 
   const spanDays = 6 + stage * 4 + (index % 4);

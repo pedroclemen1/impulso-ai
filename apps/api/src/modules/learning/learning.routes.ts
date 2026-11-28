@@ -43,7 +43,7 @@ export const learningRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.post(
     '/heartbeat',
-    { schema: { tags: ['learning'], summary: 'Registra atividade para cálculo do tempo de aprendizagem', body: z.object({ courseId: z.string().uuid().optional() }).default({}) }, config: { rateLimit: { max: 10, timeWindow: '1 minute' } } },
+    { schema: { tags: ['learning'], summary: 'Registra atividade para cálculo do tempo de aprendizagem', body: z.object({ courseId: z.string().uuid().optional() }).default({}) }, config: { rateLimit: { max: 30, timeWindow: '1 minute' } } },
     async (req) => ok(await LearningService.heartbeat(currentUser(req).id, req.body?.courseId)),
   );
 

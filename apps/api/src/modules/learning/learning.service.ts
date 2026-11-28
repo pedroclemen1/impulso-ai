@@ -286,7 +286,7 @@ export const LearningService = {
       level,
       levelLabel: levelLabel(level),
       presentation,
-      module: lesson.module,
+      module: { ...lesson.module, hasQuiz: s.version.assessments.some((x) => x.kind === 'MODULE_QUIZ' && x.moduleId === lesson.module.id) },
       lesson: {
         id: lesson.id,
         title: lesson.title,
@@ -417,10 +417,11 @@ export const LearningService = {
       create: { enrollmentId: e.id, lessonId, userId },
       update: {},
     });
+    const now = Date.now();
     await prisma.tutorMessage.createMany({
       data: [
-        { conversationId: conversation.id, role: 'STUDENT', kind: 'MESSAGE', content: `**Minha reflexão:** ${reflection}` },
-        { conversationId: conversation.id, role: 'TUTOR', kind: 'CONSOLIDATION', content: result.data.summary, metadata: consolidation },
+        { conversationId: conversation.id, role: 'STUDENT', kind: 'MESSAGE', content: `**Minha reflexão:** ${reflection}`, createdAt: new Date(now) },
+        { conversationId: conversation.id, role: 'TUTOR', kind: 'CONSOLIDATION', content: result.data.summary, metadata: consolidation, createdAt: new Date(now + 1) },
       ],
     });
     await touchEnrollment(e.id, { lastLessonId: lessonId });
