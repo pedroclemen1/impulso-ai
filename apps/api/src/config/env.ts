@@ -1,10 +1,5 @@
 import { z } from 'zod';
 
-const bool = z
-  .string()
-  .optional()
-  .transform((v) => v === 'true' || v === '1');
-
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().default(3333),
@@ -13,7 +8,8 @@ const envSchema = z.object({
   WEB_ORIGIN: z.string().default('http://localhost:5173'),
   SESSION_TTL_HOURS: z.coerce.number().positive().default(12),
   SESSION_IDLE_MINUTES: z.coerce.number().positive().default(120),
-  COOKIE_SECURE: bool,
+  /** Se não definido, cookies são Secure apenas em produção. */
+  COOKIE_SECURE: z.enum(['true', 'false']).optional(),
   SERVE_WEB_DIST: z.string().optional(),
   LOG_LEVEL: z.string().default('info'),
 
@@ -49,4 +45,5 @@ function loadEnv(): Env {
 
 export const env = loadEnv();
 export const isProduction = env.NODE_ENV === 'production';
+export const cookieSecure = env.COOKIE_SECURE ? env.COOKIE_SECURE === 'true' : isProduction;
 export const allowedOrigins = env.WEB_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);

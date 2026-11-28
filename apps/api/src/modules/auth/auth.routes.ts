@@ -1,6 +1,6 @@
 import { changePasswordSchema, loginSchema, profileUpdateSchema } from '@impulso/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { env, isProduction } from '../../config/env';
+import { cookieSecure } from '../../config/env';
 import { prisma } from '../../database/prisma';
 import { currentUser, requireAuth } from '../../middlewares/auth';
 import { badRequest, unauthorized } from '../../shared/errors';
@@ -10,7 +10,7 @@ import { createSession, revokeAllUserSessions, revokeSession, SESSION_COOKIE } f
 
 const cookieOptions = (expires?: Date) => ({
   httpOnly: true,
-  secure: env.COOKIE_SECURE || isProduction,
+  secure: cookieSecure,
   sameSite: 'lax' as const,
   path: '/',
   expires,

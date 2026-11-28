@@ -152,7 +152,10 @@ function charts(d: Data) {
     const t = timeline.get(dayKey(m.createdAt));
     if (t) t.tutorInteractions++;
   }
-  for (const p of d.progress) if (p.completedAt) timeline.get(dayKey(p.completedAt)) && timeline.get(dayKey(p.completedAt))!.lessonsCompleted++;
+  for (const p of d.progress) {
+    const t = p.completedAt ? timeline.get(dayKey(p.completedAt)) : undefined;
+    if (t) t.lessonsCompleted++;
+  }
 
   const byCourse = new Map<string, typeof e>();
   for (const x of e) byCourse.set(x.courseId, [...(byCourse.get(x.courseId) ?? []), x]);

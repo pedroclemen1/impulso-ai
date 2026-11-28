@@ -33,7 +33,7 @@ export const reportsRoutes: FastifyPluginAsyncZod = async (app) => {
       return reply
         .header('content-type', 'text/csv; charset=utf-8')
         .header('content-disposition', `attachment; filename="${r.file}-${date}.csv"`)
-        .send(`﻿${toCsv(rows as Record<string, unknown>[])}`);
+        .send(`\uFEFF${toCsv(rows as Record<string, unknown>[])}`);
     },
   );
 

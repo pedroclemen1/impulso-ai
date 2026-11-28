@@ -50,5 +50,6 @@
       "embedded-postgres",
       "@embedded-postgres/linux-x64"
     ]
-  }
+  },
+  "type": "module"
 }
