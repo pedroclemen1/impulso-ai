@@ -3,7 +3,7 @@ import type { CourseGenerationJob, Prisma } from '@prisma/client';
 import { prisma, type Tx } from '../../../database/prisma';
 import { notFound } from '../../../shared/errors';
 import { createLesson, upsertAssessment, type QuestionData } from '../../courses/content-writer';
-import { uniqueSlug } from '../../courses/courses.service';
+import { requireDraftVersion, uniqueSlug } from '../../courses/courses.service';
 import { ai } from '../ai.client';
 import type { CourseAssessmentsInput, ModuleContentInput } from '../inputs';
 import { courseAssessmentsPrompt, courseOutlinePrompt, moduleContentPrompt } from '../prompts';
@@ -212,6 +212,63 @@ export const CourseGenerationService = {
       if (opts.wait) await promise;
     }
     return prisma.courseGenerationJob.findUniqueOrThrow({ where: { id: jobId } });
+  },
+
+  /** Gera um módulo adicional (com aulas, atividade e avaliação) no rascunho de um curso existente. */
+  async generateModule(courseId: string, data: { title: string; description: string; objectives: string[]; lessonCount: number }, userId: string) {
+    const draft = await requireDraftVersion(courseId);
+    const version = await prisma.courseVersion.findUniqueOrThrow({ where: { id: draft.id }, include: { competencies: { include: { competency: true } }, modules: true } });
+    const competencies = version.competencies.map((c) => ({ key: c.competency.key, name: c.competency.name, description: c.competency.description }));
+    const comps = new Map(version.competencies.map((c) => [c.competency.key, c.competency.id]));
+    const input: ModuleContentInput = {
+      params: {
+        topic: version.title,
+        targetAudience: version.targetAudience || 'Profissionais de RH',
+        professionalContext: 'Recrutamento e seleção',
+        expectedLevel: version.difficulty,
+        methodology: 'ADDIE com feedback socrático',
+        additionalInstructions: '',
+      },
+      courseTitle: version.title,
+      competencies: competencies.length ? competencies : [{ key: 'geral', name: 'Geral', description: '' }],
+      module: {
+        title: data.title,
+        description: data.description,
+        objectives: data.objectives,
+        lessonTitles: Array.from({ length: data.lessonCount }, (_, i) => (i === 0 ? `Fundamentos: ${data.title}` : `Aplicação prática ${i}: ${data.title}`)),
+      },
+      moduleIndex: version.modules.length,
+      totalModules: version.modules.length + 1,
+      minutesPerLesson: 20,
+      includeActivity: true,
+    };
+    const { system, prompt } = moduleContentPrompt(input);
+    const res = await ai.generateStructured({ operation: 'module_content', system, prompt, schema: moduleContentSchema, input, maxTokens: 12000 }, { userId });
+    return prisma.$transaction(
+      async (tx) => {
+        const order = (version.modules.reduce((m, x) => Math.max(m, x.order), 0) ?? 0) + 1;
+        const created = await tx.module.create({ data: { courseVersionId: version.id, order, title: data.title, description: data.description, objectives: data.objectives } });
+        for (const [i, l] of res.data.lessons.entries()) {
+          await createLesson(tx, created.id, i + 1, {
+            ...l,
+            competencies: (l.competencyKeys ?? []).map((k) => comps.get(k)).filter((x): x is string => !!x).map((competencyId) => ({ competencyId, weight: 1 })),
+            activity: l.activity ?? null,
+          });
+        }
+        if (res.data.quiz?.questions.length) {
+          await upsertAssessment(tx, version.id, {
+            kind: 'MODULE_QUIZ',
+            moduleId: created.id,
+            title: `Avaliação do módulo: ${data.title}`,
+            passingScore: 60,
+            maxAttempts: 3,
+            questions: res.data.quiz.questions.map((q) => toQuestionData(q, comps)),
+          });
+        }
+        return created;
+      },
+      { timeout: 60_000 },
+    );
   },
 
   /** Retoma jobs interrompidos por reinício do servidor. */

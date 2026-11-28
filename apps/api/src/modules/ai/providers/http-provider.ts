@@ -1,4 +1,4 @@
-import type { ZodType } from 'zod';
+import type { ZodType, ZodTypeDef } from 'zod';
 import {
   AIProviderError,
   type AIProvider,
@@ -36,7 +36,7 @@ export function extractJson(text: string): unknown {
   }
 }
 
-export function parseStructured<T>(text: string, schema: ZodType<T>): T {
+export function parseStructured<T>(text: string, schema: ZodType<T, ZodTypeDef, unknown>): T {
   const json = extractJson(text);
   const parsed = schema.safeParse(json);
   if (!parsed.success) {

@@ -1,4 +1,4 @@
-import type { ZodType } from 'zod';
+import type { ZodType, ZodTypeDef } from 'zod';
 
 export type AIOperation =
   | 'course_outline'
@@ -29,7 +29,7 @@ export interface StructuredGenerationRequest<T> extends GenerationOptions {
   operation: AIOperation;
   system: string;
   prompt: string;
-  schema: ZodType<T>;
+  schema: ZodType<T, ZodTypeDef, unknown>;
   /** Entrada estruturada da operação — usada por provedores determinísticos (demo). */
   input: unknown;
 }
